@@ -9,22 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+The question this research is aiming to give an answer to is:
+"Can a death event be predicted when blood ejection fraction and platelet data is given using machine learning techniques?"
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
+data$age <- as.integer(data$age)
 
-```{r cars}
-summary(cars)
+
+```
+```{r}
+dead <- data$DEATH_EVENT == 1
+myColors <- c("#746AB0", "#E83845")
+
+library(ggplot2)
+ggplot(data = data, aes(x = serum_creatinine, y = creatinine_phosphokinase, colour = factor(dead))) +
+  geom_point(alpha = 0.5) + scale_color_manual(values=myColors)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
