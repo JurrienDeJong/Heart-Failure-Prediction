@@ -9,22 +9,45 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+codebook <- read.csv(file = "codebook.csv")
+knitr::kable(codebook)
+```
+
 The question this research is aiming to give an answer to is:
-"Can a death event be predicted when blood ejection fraction and platelet data is given using machine learning techniques?"
+"Can a death event be predicted when blood ejection fraction and age data is given using machine learning techniques?"
 
 ```{r}
+library(dplyr)
+library(tibble)
 
 data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
 data$age <- as.integer(data$age)
+data <- data[data$age <= 80,]
 
+data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("F","M")),
+                        anaemia = factor(anaemia, levels = c(0,1), labels = c("False","True")),
+                        DEATH_EVENT = factor(DEATH_EVENT, levels = c(0,1), labels = c("False","True")),
+                        smoking = factor(smoking, levels = c(0,1), labels = c("False","True")),
+                        diabetes = factor(diabetes, levels = c(0,1), labels = c("False","True")),
+                        high_blood_pressure = factor(high_blood_pressure, levels = c(0,1), labels = c("False","True")))
 
+tibble(data)
 ```
+
 ```{r}
-dead <- data$DEATH_EVENT == 1
+
 myColors <- c("#746AB0", "#E83845")
 
 library(ggplot2)
-ggplot(data = data, aes(x = serum_creatinine, y = creatinine_phosphokinase, colour = factor(dead))) +
-  geom_point(alpha = 0.5) + scale_color_manual(values=myColors)
+ggplot(data = data, aes(x = age, y = serum_creatinine, colour = DEATH_EVENT)) + 
+   xlab("Age ( in years )") + 
+   ylab("Blood serum creatinine ( in mg/dL )") +
+   geom_point(alpha = 0.5) + 
+   scale_color_manual(values=myColors) + 
+   geom_jitter(width = 1) + 
+   geom_smooth() +
+   labs(col = "Death during follow-up")
 ```
+
 

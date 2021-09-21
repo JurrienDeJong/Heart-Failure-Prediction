@@ -1,0 +1,14 @@
+Name,Full Name,Data Type,Unit, Description;
+age,age,int,years,age in years;
+Anaemia,aneamia,boolean,0 (no) or 1 (yes),decrease of red blood cells or hemoglobin;
+HBP,high blood pressure,boolean,0 (no) or 1 (yes),if the patient has hypertension;
+CPK,creatinine phosphokinase,mcg/l (int),level of the CPK enzyme in the blood;
+diabetes,diabetes,boolean,0 (no) or 1 (yes),if the patient has diabetes;
+ejection fraction,ejection fraction,int,percentage,percentage of blood leaving the heart at each contraction;
+platelets,platelets,double,kiloplatelets/mL,platelets in the blood;
+sex,sex,boolean,N/A,woman or man;
+serum creatinine,serum creatinine,double,mg/dL,level of serum creatinine in the blood;
+serum sodium,serum sodium,int,mEq/L,level of serum sodium in the blood;
+smoking,smoking,boolean,0 (no) or 1 (yes),if the patient smokes or not;
+time,time,int,time in days,follow-up period;
+death event,death event,boolean,0 (no) or 1 (yes),if the patient deceased during the follow-up period;
