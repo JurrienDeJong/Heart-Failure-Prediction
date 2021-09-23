@@ -2,14 +2,31 @@
 title: "ProjectThema9"
 author: "Jurrien"
 date: "9/15/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
+
+# Data Origin
+
+The dataset analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015 [52, 66]. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library("ggplot2")
+library("dplyr")
+library("ggfortify")
+library("dplyr")
+library("tibble")
+library("factoextra")
+```
+
+
+```{r, echo = FALSE}
 codebook <- read.csv(file = "codebook.csv")
 knitr::kable(codebook)
 ```
@@ -17,14 +34,19 @@ knitr::kable(codebook)
 The question this research is aiming to give an answer to is:
 "Can a death event be predicted when blood ejection fraction and age data is given using machine learning techniques?"
 
-```{r}
-library(dplyr)
-library(tibble)
 
+At first, the data will be read, and saved in the variable data.
+```{r, echo = FALSE, message = FALSE}
 data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
 data$age <- as.integer(data$age)
-data <- data[data$age <= 80,]
+```
+```{r}
+str(data)
+```
+As seen above, some of the values have the incorrect data type. To fix this issue, mutate will be used. The 0,1 structure will be replaced by "False/True" to make the readability better and also increase the reproducibility.
 
+
+```{r, echo = FALSE}
 data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("F","M")),
                         anaemia = factor(anaemia, levels = c(0,1), labels = c("False","True")),
                         DEATH_EVENT = factor(DEATH_EVENT, levels = c(0,1), labels = c("False","True")),
@@ -35,19 +57,88 @@ data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("F","M")),
 tibble(data)
 ```
 
-```{r}
+At first we are gonna check if the data contains missing values or major outliers,
 
-myColors <- c("#746AB0", "#E83845")
+```{r, echo = FALSE}
 
-library(ggplot2)
-ggplot(data = data, aes(x = age, y = serum_creatinine, colour = DEATH_EVENT)) + 
-   xlab("Age ( in years )") + 
-   ylab("Blood serum creatinine ( in mg/dL )") +
-   geom_point(alpha = 0.5) + 
-   scale_color_manual(values=myColors) + 
-   geom_jitter(width = 1) + 
-   geom_smooth() +
-   labs(col = "Death during follow-up")
+boxplot(data$serum_creatinine)
+boxplot(data$serum_sodium)
+boxplot(data$age, main = "Boxplot of the Age column")
+
 ```
 
+# Relationship between variables
+
+It is important to get to know what kind of relationship there is between the variables. Lets first 'cut out' the part of the data which will be used for the research. The serum and age data will be used, which are from columns 1,8 and 9 because the age, serum creatinine and serum sodium values have a great impact on heart disease, as seen in LINK HERE.
+```{r}
+# Get the columns we will use for this research
+used_data <- data[,c(1,8,9)]
+```
+
+
+```{r, echo = FALSE, message = FALSE}
+library(ggplot2)
+library(gridExtra)
+myColors <- c("#746AB0", "#E83845")
+
+
+p1 <- ggplot(data = data, aes(x = age, y = serum_creatinine, colour = DEATH_EVENT)) + 
+      xlab("Age ( in years )") + 
+      ylab("Serum creatinine ( in mg/dL )") +
+      ggtitle("The relations between age, serum creatinine and if the 
+           person died during follow-up") +
+      geom_point(alpha = 0.01) + 
+      scale_color_manual(values=myColors) + 
+      geom_jitter(width = 0.3) + 
+      geom_smooth(method = "loess", formula = y ~ x) +
+      labs(col = "Death during follow-up")
+
+#### Serum Sodium ####
+
+p2 <- ggplot(data = data, aes(x = age, y = serum_sodium, colour = DEATH_EVENT)) + 
+      xlab("Age ( in years )") + 
+      ylab("Serum sodium ( in mg/dL )") +
+      ggtitle("The relations between age, serum sodium and if the 
+           person died during follow-up") +
+      geom_point(alpha = 0.01) + 
+      scale_color_manual(values=myColors) + 
+      geom_jitter(width = 0.3) + 
+      geom_smooth(method = "loess", formula = y ~ x) +
+      labs(col = "Death during follow-up")
+
+grid.arrange(p1,p2, layout_matrix = rbind(c(1,1,1),c(1,1,1),c(1,1,1),c(2,2,2),c(2,2,2),c(2,2,2)))
+```
+
+
+
+```{r, echo = FALSE, message = FALSE}
+
+scaled_data <-scale(data[,c(1,8)])
+
+kmean <- kmeans(scaled_data, 2)
+kmean$centers
+autoplot(kmean, scaled_data, frame = TRUE)
+```
+```{r}
+ggplot(data, aes(x=data$serum_sodium)) + geom_density(aes(color=data$DEATH_EVENT))
+ggplot(data, aes(x=data$serum_creatinine)) + geom_density(aes(color=data$DEATH_EVENT))
+```
+
+```{r, echo = FALSE}
+PCA_data <- data[c(1,8,9)]
+
+data.pr <- prcomp((PCA_data), center = TRUE, scale = TRUE)
+fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21, 
+             pointsize = 2, 
+             fill.ind = data$DEATH_EVENT, 
+             col.ind = "black", 
+             palette = "jco", 
+             addEllipses = TRUE,
+             label = "var",
+             col.var = "black",
+             repel = TRUE,
+             legend.title = "Death Event") +
+  ggtitle("2D PCA-plot for heart failure dataset") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
