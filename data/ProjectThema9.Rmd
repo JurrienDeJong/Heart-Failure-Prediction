@@ -239,3 +239,19 @@ fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21,
 
 The PCA-plot seems to give the same result as the k-means cluster. A 'death' cluster seems to emerge when data points go to the left. There is however overlap between the false and true clusters, so the probability to predict a correct death event might not be very high.
 
+-------------
+
+First, the factored data will be saved to use in the program called weka, which will be used to perform all sorts of algorithms on the data. 
+
+```{r}
+write.csv(factored_data, "data.csv")
+```
+
+For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. Because a small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture.
+
+# Performance of ML algorithms
+
+In order to choose which ML algorithm is best, it is a good exercise to look at the results of each algorithm.
+To start, ZeroR and OneR will be used to measure baseline performance. Although they do not seem important, they can be used to check if you are over fitting with other algorithms.
+
+
