@@ -1,22 +1,24 @@
 ---
 title: "ProjectThema9"
-author: "Jurrien"
-date: "9/15/2021"
+author: "Jurrien de Jong"
+date: "4/10/2021"
 output:
   pdf_document: default
   html_document: default
+  word_document: default
 ---
-
-# Data Origin
-
-The dataset analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015 [52, 66]. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. 
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(warn=-1)
 ```
 
-```{r}
+```{r, message = FALSE, echo = FALSE}
+
+# Load all necessary libraries
+
+library("reshape2")
+library("cowplot")
 library("ggplot2")
 library("dplyr")
 library("ggfortify")
@@ -25,64 +27,92 @@ library("tibble")
 library("factoextra")
 ```
 
+# Intro
 
-```{r, echo = FALSE}
-codebook <- read.csv(file = "codebook.csv")
-knitr::kable(codebook)
-```
+The dataset analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
+
+Heart failure is quite common, and thus affects a lot of people each year. The condition is the leading cause of hospitalization in people over age 65. One solution might be to prevent heart failure from happening by examining large datasets full of data which are known to relate (closely) to heart disease and/or heart failure. This research is trying to replicate this solution with a supplied dataset.
 
 The question this research is aiming to give an answer to is:
-"Can a death event be predicted when blood ejection fraction and age data is given using machine learning techniques?"
+"Can a death event be predicted when blood serum and age data is given using machine learning techniques?"
 
-
-At first, the data will be read, and saved in the variable data.
 ```{r, echo = FALSE, message = FALSE}
+
+# Read the data and change the age column to a correct datatype
 data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
 data$age <- as.integer(data$age)
 ```
-```{r}
-str(data)
-```
-As seen above, some of the values have the incorrect data type. To fix this issue, mutate will be used. The 0,1 structure will be replaced by "False/True" to make the readability better and also increase the reproducibility.
 
+# Cleaning data
+
+Before the data can be used by a Machine Learning algorithm, the data needs to be cleaned:
+
+The datatypes, readability and reproducibility are very important in an EDA. This is why the function 'mutate' comes in handy. The 0,1 structure will be replaced by "False/True" to make the readability better and also increase the reproducibility. Finally, tibble will be used to give the 'head' of the data is table. As seen in the table below, the data has labels and no missing values at all.
 
 ```{r, echo = FALSE}
-data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("F","M")),
+factored_data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("F","M")),
                         anaemia = factor(anaemia, levels = c(0,1), labels = c("False","True")),
                         DEATH_EVENT = factor(DEATH_EVENT, levels = c(0,1), labels = c("False","True")),
                         smoking = factor(smoking, levels = c(0,1), labels = c("False","True")),
                         diabetes = factor(diabetes, levels = c(0,1), labels = c("False","True")),
-                        high_blood_pressure = factor(high_blood_pressure, levels = c(0,1), labels = c("False","True")))
+                        high_blood_pressure = factor(high_blood_pressure, levels = c(0,1), labels =
+                        c("False","True")))
 
-tibble(data)
+tibble(factored_data)
 ```
 
-At first we are gonna check if the data contains missing values or major outliers,
+# Viewing the data
+
+It is very important to check if the data contains major outliers or maybe even typos. This could be dramatic to the results/conclusions of the research. By creating boxplots, outliers can be visible outside the 'box' as dots:
 
 ```{r, echo = FALSE}
+b1 <- ggplot(factored_data, aes(y=serum_creatinine)) + 
+      geom_boxplot() +
+      ggtitle("Boxplot showing serum creatinine \ndata distribution") +
+      ylab("Serum creatinine (in mg/dL)")
 
-boxplot(data$serum_creatinine)
-boxplot(data$serum_sodium)
-boxplot(data$age, main = "Boxplot of the Age column")
+b2 <- ggplot(factored_data, aes(y=serum_sodium)) + 
+      geom_boxplot() +
+      ggtitle("Boxplot showing serum sodium \ndata distribution") +
+      ylab("Serum sodium (in mEq/L)")
 
+b3 <- ggplot(factored_data, aes(y=age)) + 
+      geom_boxplot() +
+      ggtitle("Boxplot showing age ]data distribution") +
+      ylab("Age ( in years )")
+
+plot_grid(b1, b2, NULL, b3, labels = c("A","B","","C"),
+          label_size = 12,
+          label_x = 0.9,
+          label_y = 0.78,
+          hjust = 0,
+          vjust = 0,
+          label_fontfamily = "serif",
+          label_fontface = "plain",
+          label_colour = "dark blue")
 ```
 
-# Relationship between variables
+As seen in figure A above, the data contains many outliers. A normal serum creatinine value ranges between 0.59 and 1.35 mg/dL while the data contains values which are close to 10. Taken into account that the patients who have taken part in this research have underlying heart/renal conditions, these values are acceptable. This trend is also visible in figure B, while the range of the outliers is much smaller than figure A. The normal serum sodium level ranges between 135 and 145 milliequivalents per liter (mEq/L). As seen in figure B some outliers have much lower sodium values, this could be quite harmful to the heart because decreased sodium can cause muscle dysfunction and ultimately heart failure. The age boxplot seen in figure C shows normally distributed data. This can be supported by the fact that people get examined more as they get older because key body functions, like muscle- and renal function, will on average deteriorate over time.
 
-It is important to get to know what kind of relationship there is between the variables. Lets first 'cut out' the part of the data which will be used for the research. The serum and age data will be used, which are from columns 1,8 and 9 because the age, serum creatinine and serum sodium values have a great impact on heart disease, as seen in LINK HERE.
-```{r}
+# Relationship between attributes
+
+## Dotplot
+
+It is important to get to know what kind of relationship there is between the variables. Let's first 'cut out' the part of the data which will be used for the research. The serum and age data will be used, which are from columns 1,8 and 9 because the age, serum creatinine and serum sodium values have a great impact on heart disease and renal dysfunction, as seen in "Survival analysis of heart failure patients: a case study". Below the relations are plotted in graphs:
+
+```{r, echo = FALSE, message= FALSE}
 # Get the columns we will use for this research
-used_data <- data[,c(1,8,9)]
+used_data <- factored_data[,c(1,8,9)]
 ```
-
 
 ```{r, echo = FALSE, message = FALSE}
-library(ggplot2)
-library(gridExtra)
+
+# Chose good visual colors
 myColors <- c("#746AB0", "#E83845")
 
+#### Serum Creatinine ####
 
-p1 <- ggplot(data = data, aes(x = age, y = serum_creatinine, colour = DEATH_EVENT)) + 
+p1 <- ggplot(data = factored_data, aes(x = age, y = serum_creatinine, colour = DEATH_EVENT)) + 
       xlab("Age ( in years )") + 
       ylab("Serum creatinine ( in mg/dL )") +
       ggtitle("The relations between age, serum creatinine and if the 
@@ -95,9 +125,9 @@ p1 <- ggplot(data = data, aes(x = age, y = serum_creatinine, colour = DEATH_EVEN
 
 #### Serum Sodium ####
 
-p2 <- ggplot(data = data, aes(x = age, y = serum_sodium, colour = DEATH_EVENT)) + 
+p2 <- ggplot(data = factored_data, aes(x = age, y = serum_sodium, colour = DEATH_EVENT)) + 
       xlab("Age ( in years )") + 
-      ylab("Serum sodium ( in mg/dL )") +
+      ylab("Serum sodium ( in mEq/L )") +
       ggtitle("The relations between age, serum sodium and if the 
            person died during follow-up") +
       geom_point(alpha = 0.01) + 
@@ -106,31 +136,96 @@ p2 <- ggplot(data = data, aes(x = age, y = serum_sodium, colour = DEATH_EVENT)) 
       geom_smooth(method = "loess", formula = y ~ x) +
       labs(col = "Death during follow-up")
 
-grid.arrange(p1,p2, layout_matrix = rbind(c(1,1,1),c(1,1,1),c(1,1,1),c(2,2,2),c(2,2,2),c(2,2,2)))
+plot_grid(p1,p2,ncol=1, labels = "AUTO",
+          label_size = 12,
+          label_x = 0.8,
+          label_y = 0.78,
+          hjust = 0,
+          vjust = 0,
+          label_fontfamily = "serif",
+          label_fontface = "plain",
+          label_colour = "dark blue")
 ```
 
+As mentioned before, a higher serum creatinine count or a lower serum sodium count than normal can result in heart failure. The literature found was correct as seen in the plot above. Figure A shows an increased death chance if the creatinine value is higher than 0.125 mg/dL and figure B shows an increased death chance if the sodium drops below 135 mEq/L.
 
+## Density
+
+A density plot can be used to help display where values are concentrated over the interval. For this instance the interval is the amount of creatinine or sodium in the blood serum. To illustrate which concentration seems fatal, two density plots have been created, and colored based on the outcome of the follow-up period:
+
+```{r, echo = FALSE, message= FALSE}
+d1 <- ggplot(factored_data, aes(x=serum_creatinine)) +
+    geom_density(aes(color = DEATH_EVENT)) +
+    labs(colour = "Death Event") +
+    xlab("Serum creatinine ( in mg/dL )") +
+    ylab("Density") +
+    scale_color_manual(values=c("#9992FF", "#DD6755"))
+
+d2 <- ggplot(factored_data, aes(x=serum_sodium)) +
+    geom_density(aes(color = DEATH_EVENT)) +
+    labs(colour = "Death Event") +
+    xlab("Serum sodium ( in mEq/L )") +
+    ylab("Density") +
+    scale_color_manual(values=c("#9992FF", "#DD6755"))
+
+plot_grid(d1,d2,ncol=1, labels = "AUTO")
+```
+
+Just like the dotplot before, the density plot shows that a lower serum sodium value seems more fatal, as is a slightly higher serum creatinine value. The difference in frequency of figure B does seem more convincing than figure A.
+
+## Correlation
+
+The correlation is an extremely important factor in machine learning because ML algorithms assume that all attributes are independent. When looking at the heatmap below, 3 attributes stand out. At first, the follow-up time has a very negative correlation to the class attribute. The serum sodium has a somewhat negative correlation while the serum creatinine shows that there is a positive correlation between it and death event. So concluded, both values have differing correlation with the death event attribute which means they are independent.
+
+```{r, echo = FALSE, message= FALSE}
+
+cormat <- round(cor(data),2)
+melted_cormat <- melt(cormat)
+
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +  
+    scale_fill_gradient2(low = "#075AFF",
+                       mid = "#FFFFCC",
+                       high = "#FF0000") +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  coord_fixed() +
+  xlab("") +
+  ylab("") +
+  ggtitle("Heatmap showing the correlation between \nheart failure attributes")
+```
+
+A heatmap visualizing the correlation between all heart value attributes. The red in the diagonal can be ignored because it represents a correlation of one variable instead of two. When the color of a tile is close to white there is no to near minimal correlation between attributes. If the tile is blue colored, there is a negative correlation present, while a red color indicates a positive correlation.
+
+
+## Clustering
+
+Clustering can be a great tool to give a better understanding of the data by discovering patterns. Below, a k-means cluster of 2 will be performed. A k of 2 has been chosen because the death event attribute has 2^1 possibilities.
 
 ```{r, echo = FALSE, message = FALSE}
+# Compute k-means with k = 3
+set.seed(123)
+res.km <- kmeans(scale(used_data), 2, nstart = 25)
 
-scaled_data <-scale(data[,c(1,8)])
+fviz_cluster(res.km, data = used_data,
+             palette = c("#DD6755","#9992FF"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw(),
+             main = "Cluster of heart failure data using k = 2"
+             )
+```
 
-kmean <- kmeans(scaled_data, 2)
-kmean$centers
-autoplot(kmean, scaled_data, frame = TRUE)
-```
-```{r}
-ggplot(data, aes(x=data$serum_sodium)) + geom_density(aes(color=data$DEATH_EVENT))
-ggplot(data, aes(x=data$serum_creatinine)) + geom_density(aes(color=data$DEATH_EVENT))
-```
+In the plot above there can clearly be seen that two independent clusters have been formed with the given data. The most right cluster in blue represents the patients who survived while the red cluster shows the patients which died during follow-up. There is however a small section visible where the two clusters overlay, which means that it is not certain what the result will be for patients inside that range.
+
+Next a PCA cluster plot will be created. It is quite similar to the k-means cluster, so the result will most likely be the same. It shows clusters of samples based on their similarity, which gives a good indication for independent values. PCA is mostly used to decrease the amount of dimensions of dataset, but in this instance that is not the reason.
 
 ```{r, echo = FALSE}
-PCA_data <- data[c(1,8,9)]
+PCA_data <- used_data
 
 data.pr <- prcomp((PCA_data), center = TRUE, scale = TRUE)
 fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21, 
              pointsize = 2, 
-             fill.ind = data$DEATH_EVENT, 
+             fill.ind = factored_data$DEATH_EVENT, 
              col.ind = "black", 
              palette = "jco", 
              addEllipses = TRUE,
@@ -141,4 +236,6 @@ fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21,
   ggtitle("2D PCA-plot for heart failure dataset") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+The PCA-plot seems to give the same result as the k-means cluster. A 'death' cluster seems to emerge when data points go to the left. There is however overlap between the false and true clusters, so the probability to predict a correct death event might not be very high.
 
