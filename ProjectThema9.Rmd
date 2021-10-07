@@ -1,4 +1,9 @@
- ---
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+---
 title: "ProjectThema9"
 author: "Jurrien de Jong"
 date: "4/10/2021"
@@ -10,12 +15,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-options(warn=-1)
-```
-
-```{r, message = FALSE, echo = FALSE}
-
-# Load all necessary libraries
 
 library("reshape2")
 library("cowplot")
@@ -25,7 +24,15 @@ library("ggfortify")
 library("dplyr")
 library("tibble")
 library("factoextra")
+library("knitr")
 ```
+
+
+```{r}
+codebook <- read.delim("data/codebook.csv", sep = ",")
+kable(codebook, caption = "Table 1 : Codebook")
+```
+
 
 # Intro
 
@@ -39,7 +46,7 @@ The question this research is aiming to give an answer to is:
 ```{r, echo = FALSE, message = FALSE}
 
 # Read the data and change the age column to a correct datatype
-data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
+data <- read.csv(file = "data/heart_failure_clinical_records_dataset.csv")
 data$age <- as.integer(data$age)
 ```
 
@@ -250,7 +257,7 @@ write.csv(used_data, "data.csv")
 
 
 
-For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this ocassion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality
+For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this ocassion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
 
 # Performance of ML algorithms
 
@@ -268,6 +275,10 @@ Naive Bayes makes a percentage based on all attributes. Some attributes might no
 
 There is no clear linear line visible in the data, so simple logistic might not be a good choice. When run however, 73.2442% of instances were correctly predicted. The only down side is that 69 people got a false positive result, which is a pretty big chunk of patients. This situation should never happen in hospitals so this algorithm also does not function per request.
 
+```{r}
+codebook <- read.delim("data/algorithm_data.csv", sep = ",")
+kable(codebook, caption = "Table 2 : Algorithm Data")
+```
 
 
 
