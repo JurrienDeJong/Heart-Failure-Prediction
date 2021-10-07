@@ -248,9 +248,6 @@ used_data <- factored_data[,c(1,8,9,13)]
 write.csv(used_data, "data.csv")
 ```
 
-```{r}
-
-```
 
 
 For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this ocassion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality
