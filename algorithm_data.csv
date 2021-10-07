@@ -1,0 +1,7 @@
+﻿Algorithm,Speed,Accuracy,True Positive,False Positive,True Negative,False Negative
+ZeroR,0 sec,67.89%,0,0,96,203
+OneR,0 sec,75.59%,30,7,66,196
+J48,0.01 sec,77.93%,40,10,56,193
+IKB,0.03 sec,99.67%,96,1,0,202
+Naïve Bayes,0 sec,72.58%,30,16,66,187
+Simple Logistic,0.14 sec,73.24%,27,11,69,192
