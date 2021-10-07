@@ -247,11 +247,20 @@ First, the factored data will be saved to use in the program called weka, which 
 write.csv(factored_data, "data.csv")
 ```
 
-For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. Because a small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture.
+For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this ocassion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture.
 
 # Performance of ML algorithms
 
 In order to choose which ML algorithm is best, it is a good exercise to look at the results of each algorithm.
 To start, ZeroR and OneR will be used to measure baseline performance. Although they do not seem important, they can be used to check if you are over fitting with other algorithms.
+
+ZeroR only chooses which occurs the most of the death event class. Most of the people did not die during follow-up, so ZeroR chooses false. The percentage of correct guesses was only 67.893% so improvements can be made by more complex algorithms. The confusion matrix contains no true values, because false was chosen by ZeroR, and 96 false positives out of 299 instances.
+OneR, on the other hand, did a much better job at predicting a death event. This is possibly because OneR takes the best attribute to predict a death event with. 86.6221% of instances were predicted correctly, so this might be one of the best algorithms. But let's first look at the other ones. All confusion matrix values are visible in the table below.
+
+Next up, the decision trees. Because a big part of the data contains numeric values, J48 will be used, which can deal with such values. When creating a tree with a small bucket size, the tree becomes quite overwhelming. To fix this issue, a bucket size of 10 will be used which gives a much smaller tree, which also gives quite an accurate percentage: 86.6221%.
+
+Nearest neighbor seems like a good algorithm because all of the data points close to each other will 'cluster' towards one of the boolean values, true or false. A small k-size might not give accurate results, so a k of 5 will be used.
+
+
 
 
