@@ -1,0 +1,9 @@
+Algorithm,Accuracy %,Speed sec,True Positive,False Positive,True Negative,False Negative
+ZeroR,67.83,0,0,0,96,203
+OneR,73.57,0.01,35,18,61,185
+J48,72.57,0.02,37,23,59,180
+IBK(k=3),67.22,0,40,42,56,161
+Naive Bayes,71.90,0.01,29,17,67,186
+Simple Logistic,72.90,0.17,28,13,68,190
+SMO,68.56,0.03,4,2,92,201
+Random Forest,73.24,0.15,51,35,45,168

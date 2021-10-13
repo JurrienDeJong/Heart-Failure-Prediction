@@ -85,7 +85,7 @@ b2 <- ggplot(factored_data, aes(y=serum_sodium)) +
 
 b3 <- ggplot(factored_data, aes(y=age)) + 
       geom_boxplot() +
-      ggtitle("Boxplot showing age ]data distribution") +
+      ggtitle("Boxplot showing age \ndata distribution") +
       ylab("Age ( in years )")
 
 plot_grid(b1, b2, NULL, b3, labels = c("A","B","","C"),
@@ -257,7 +257,7 @@ write.csv(used_data, "data.csv")
 
 
 
-For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this ocassion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
+For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this occasion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, so it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
 
 # Performance of ML algorithms
 
@@ -277,10 +277,13 @@ There is no clear linear line visible in the data, so simple logistic might not 
 
 ```{r}
 codebook <- read.delim("data/algorithm_data.csv", sep = ",")
-kable(codebook, caption = "Table 2 : Algorithm Data")
+kable(codebook, caption = "Table 2a : Algorithm Data")
 ```
 
-
+```{r}
+codebook <- read.delim("data/algorithm_data_validated.csv", sep = ",")
+kable(codebook, caption = "Table 2b : Validated Algorithm Data")
+```
 
 
 
