@@ -252,7 +252,8 @@ First, the factored data will be saved to use in the program called weka, which 
 
 ```{r}
 used_data <- factored_data[,c(1,8,9,13)]
-write.csv(used_data, "data.csv")
+used_data
+write.csv(used_data, "data/data.csv", row.names = FALSE)
 ```
 
 
@@ -285,5 +286,13 @@ codebook <- read.delim("data/algorithm_data_validated.csv", sep = ",")
 kable(codebook, caption = "Table 2b : Validated Algorithm Data")
 ```
 
+# Ensemble Learning
+
+Next up, meta learners will be used to further validate the model, and also run statistical tests. There are multiple meta learners available, but for this research, 3 of them will be used: Stacking, Bagging and Boosting. With stacking, multiple algorithms will all perform a task, whichever algorithm does best is chosen. Bagging can help to reduce variation, and prevent overfitting. It uses a bootstrapping method which samples with replacement, so the accuracy might be pretty high. Boosting works on a 'weighing' system. Each time it does a iteration, all mistakes are weight more, so those are filtered out for the next iteration. This process continues for the max iterations provided. Below, a table can be seen which represents the data given by these meta learners. For each learner, zeroR, OneR and J48 are used as algorithms with a minimal bag size of 10. For the statistical t-test, a p-value of 0.05 is chosen, mostly because it is the default p-value. The standard deviation is also visible in the table to illustrate what the range of deviation is between all iterations.
+
+```{r}
+codebook <- read.delim("data/meta-learner_data.csv", sep = ",")
+knitr::kable(codebook, escape = TRUE)
+```
 
 

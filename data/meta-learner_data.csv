@@ -1,0 +1,9 @@
+Algorithm,Accuracy,SD
+ZeroR,67.90%,1.53
+OneR,73.41%,6.35
+J48,73.06%,6.55
+IKB,67.84%,7.29
+Naive Bayes,71.90%,6.03
+Simple Logistic,72.55%,5.68
+SMO,68.67%,2.83
+Random Forest,72.20%,7.12
