@@ -1,10 +1,5 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
----
----
-title: "ProjectThema9"
+title: "Heart failure prediction"
 author: "Jurrien de Jong"
 date: "4/10/2021"
 output:
@@ -15,6 +10,12 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(warn=-1)
+```
+
+```{r, message = FALSE, echo = FALSE}
+
+# Load all necessary libraries
 
 library("reshape2")
 library("cowplot")
@@ -24,17 +25,9 @@ library("ggfortify")
 library("dplyr")
 library("tibble")
 library("factoextra")
-library("knitr")
 ```
 
-
-```{r}
-codebook <- read.delim("data/codebook.csv", sep = ",")
-kable(codebook, caption = "Table 1 : Codebook")
-```
-
-
-# Intro
+# Introduction
 
 The dataset analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
 
@@ -65,10 +58,27 @@ factored_data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("
                         high_blood_pressure = factor(high_blood_pressure, levels = c(0,1), labels =
                         c("False","True")))
 
-tibble(factored_data)
 ```
 
-# Viewing the data
+# Material and methods
+
+For the exploratory data analysis, R and Markdown have been used. The version of R is 4.0.4, R has been used as tool for Markdown. R is a programming language used for statistics and data analysis. Graphs and plots can be easily created, so this program is ideal for a research like this. The graphs were made via the ggplot2 library. dplyr and tidyr were also used as additional tools for data transformation. 
+
+All code for the data analysis and workflow can be found in the log.
+The log can be found via github on: https://github.com/JurrienDeJong/Heart-Failure-Prediction.
+
+For the wrapper, the programming language Java has been used. The Java wrapper is made and tested on Java version 16. Via the command line, a patient's age, serum creatinine and serum sodium value can be given. The wrapper will follow the model made in Weka version 3.9.5. 
+
+The Java wrapper also uses multiple dependencies, the common CLI version 1.4 for command line arguments. And the Weka stable version 3.8.5 was used for making the instance object, preparing this object and using the model to classify. Classifying the user's instance and showing this in the terminal output. 
+
+The main wrapper page can be found on: https://github.com/JurrienDeJong/JavaWrapper, and for the exact classes on: https://github.com/JurrienDeJong/JavaWrapper/tree/main/src/main/java/nl/bioinf/wrapper
+
+Readme and support ( for both the JavaWrapper and the log ) can be directly found on: https://github.com/JurrienDeJong/JavaWrapper/blob/main/README.txt and,
+https://github.com/JurrienDeJong/Heart-Failure-Prediction/blob/main/README.txt
+
+# Results
+
+First, let's try to answer the research question by creating plots. An EDA process contains plenty of different methods of exploring the data. In this section those results will be shown.
 
 It is very important to check if the data contains major outliers or maybe even typos. This could be dramatic to the results/conclusions of the research. By creating boxplots, outliers can be visible outside the 'box' as dots:
 
@@ -85,7 +95,7 @@ b2 <- ggplot(factored_data, aes(y=serum_sodium)) +
 
 b3 <- ggplot(factored_data, aes(y=age)) + 
       geom_boxplot() +
-      ggtitle("Boxplot showing age \ndata distribution") +
+      ggtitle("Boxplot showing age ]data distribution") +
       ylab("Age ( in years )")
 
 plot_grid(b1, b2, NULL, b3, labels = c("A","B","","C"),
@@ -246,53 +256,26 @@ fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21,
 
 The PCA-plot seems to give the same result as the k-means cluster. A 'death' cluster seems to emerge when data points go to the left. There is however overlap between the false and true clusters, so the probability to predict a correct death event might not be very high.
 
--------------
-
-First, the factored data will be saved to use in the program called weka, which will be used to perform all sorts of algorithms on the data. 
-
-```{r}
-used_data <- factored_data[,c(1,8,9,13)]
-used_data
-write.csv(used_data, "data/data.csv", row.names = FALSE)
-```
-
-
+## Machine learning phase
 
 For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this occasion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, so it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
 
-# Performance of ML algorithms
-
-In order to choose which ML algorithm is best, it is a good exercise to look at the results of each algorithm.
-To start, Zero R and One R will be used to measure baseline performance. Although they do not seem important, they can be used to check if you are over fitting with other algorithms.
-
-Zero R only chooses which occurs the most of the death event class. Most of the people did not die during follow-up, so Zero R chooses false. The percentage of correct guesses was only 67.893% so improvements can be made by more complex algorithms. The confusion matrix contains no true values, because false was chosen by Zero R, and 96 false positives out of 299 instances.
-One R, on the other hand, did a much better job at predicting a death event. This is possibly because One R takes the best attribute to predict a death event with. 75.5853% of instances were predicted correctly, so this might be one of the better algorithms. But let's first look at the other ones. All confusion matrix values are visible in the table below.
-
-Next up, the decision trees. Because a big part of the data contains numeric values, J48 will be used, which can deal with such values. When creating a tree with a small bucket size, the tree becomes quite overwhelming. To fix this issue, a bucket size of 10 will be used which gives a much smaller tree, which also gives quite an accurate percentage: 77.9264%.
-
-Nearest neighbor seems like a good algorithm because all of the data points close to each other will 'cluster' towards one of the boolean values, true or false. When using k = 1, 100% of the values seem correct. But since it only uses the training data, it might not be useful in the long run.
-
-Naive Bayes makes a percentage based on all attributes. Some attributes might not be very good at predicting a death event, so this algorithm might not give a good prediction. When run, 72.5753% of instances were predicted correctly. This is smaller than of One R so taking all attributes is not the correct decision.
-
-There is no clear linear line visible in the data, so simple logistic might not be a good choice. When run however, 73.2442% of instances were correctly predicted. The only down side is that 69 people got a false positive result, which is a pretty big chunk of patients. This situation should never happen in hospitals so this algorithm also does not function per request.
-
 ```{r}
 codebook <- read.delim("data/algorithm_data.csv", sep = ",")
-kable(codebook, caption = "Table 2a : Algorithm Data")
+knitr::kable(codebook, caption = "Table 2a : Algorithm Data")
 ```
 
-```{r}
-codebook <- read.delim("data/algorithm_data_validated.csv", sep = ",")
-kable(codebook, caption = "Table 2b : Validated Algorithm Data")
-```
+# Discussion
 
-# Ensemble Learning
+Most variables seem independable of each other, as seen in the heatmap created above. This, however, is a good sign because ML algorithms need no correlated values. One point of critique might be that also data of healthy patients must be taken to look at the differences between the data of healthy people and the patients with left ventricular systolic dysfunction. 
+Some attributes which contribute to heart disease also need to be looked at in future research. Some key attributes are: daily physical activity, cholesterol levels, patient weight / BMI and most importantly for a bioinformatician, heredity. Because a lot of heart failure cases come from people who have heart disease in their family, possible heart disease needs to be caught early.
 
-Next up, meta learners will be used to further validate the model, and also run statistical tests. There are multiple meta learners available, but for this research, 3 of them will be used: Stacking, Bagging and Boosting. With stacking, multiple algorithms will all perform a task, whichever algorithm does best is chosen. Bagging can help to reduce variation, and prevent overfitting. It uses a bootstrapping method which samples with replacement, so the accuracy might be pretty high. Boosting works on a 'weighing' system. Each time it does a iteration, all mistakes are weight more, so those are filtered out for the next iteration. This process continues for the max iterations provided. Below, a table can be seen which represents the data given by these meta learners. For each learner, zeroR, OneR and J48 are used as algorithms with a minimal bag size of 10. For the statistical t-test, a p-value of 0.05 is chosen, mostly because it is the default p-value. The standard deviation is also visible in the table to illustrate what the range of deviation is between all iterations.
 
-```{r}
-codebook <- read.delim("data/meta-learner_data.csv", sep = ",")
-knitr::kable(codebook, escape = TRUE)
-```
+# Conclusion
 
+With the machine learning results and J48 scoring 77.93% accuracy.The overall result is not what should be expected to be used in hospitals.
+
+A death event is pretty hard to predict because so many variables have impact on the health of people. So to further improve this research, a whole lot of extra attributes need to be taken into consideration. A few attributes of heart data do not give a big picture of the whole situation. Also, the group size of 'only' 299 people is quite small to draw conclusions, so to improve, more patients need to be examined. J48 is also an algorithm which is easy to understand, since it uses a decision tree. With this model, a Java wrapper was made to classify new instances via the command line. Printing the classification label to the terminal output.
+
+## Future research
 

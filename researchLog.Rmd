@@ -1,5 +1,10 @@
 ---
-title: "Results, Discussion and Conclusions"
+output:
+  pdf_document: default
+  html_document: default
+---
+---
+title: "Research Log"
 author: "Jurrien de Jong"
 date: "4/10/2021"
 output:
@@ -10,12 +15,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-options(warn=-1)
-```
-
-```{r, message = FALSE, echo = FALSE}
-
-# Load all necessary libraries
 
 library("reshape2")
 library("cowplot")
@@ -25,7 +24,15 @@ library("ggfortify")
 library("dplyr")
 library("tibble")
 library("factoextra")
+library("knitr")
 ```
+
+
+```{r}
+codebook <- read.delim("data/codebook.csv", sep = ",")
+kable(codebook, caption = "Table 1 : Codebook")
+```
+
 
 # Intro
 
@@ -39,7 +46,7 @@ The question this research is aiming to give an answer to is:
 ```{r, echo = FALSE, message = FALSE}
 
 # Read the data and change the age column to a correct datatype
-data <- read.csv(file = "heart_failure_clinical_records_dataset.csv")
+data <- read.csv(file = "data/heart_failure_clinical_records_dataset.csv")
 data$age <- as.integer(data$age)
 ```
 
@@ -61,9 +68,7 @@ factored_data <- data %>% mutate(sex = factor(sex, levels = c(0,1), labels = c("
 tibble(factored_data)
 ```
 
-# Results
-
-First, let's try to answer the research question by creating plots. An EDA process contains plenty of different methods of exploring the data. In this section those results will be shown.
+# Viewing the data
 
 It is very important to check if the data contains major outliers or maybe even typos. This could be dramatic to the results/conclusions of the research. By creating boxplots, outliers can be visible outside the 'box' as dots:
 
@@ -80,7 +85,7 @@ b2 <- ggplot(factored_data, aes(y=serum_sodium)) +
 
 b3 <- ggplot(factored_data, aes(y=age)) + 
       geom_boxplot() +
-      ggtitle("Boxplot showing age ]data distribution") +
+      ggtitle("Boxplot showing age \ndata distribution") +
       ylab("Age ( in years )")
 
 plot_grid(b1, b2, NULL, b3, labels = c("A","B","","C"),
@@ -198,9 +203,7 @@ ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) +
 
 A heatmap visualizing the correlation between all heart value attributes. The red in the diagonal can be ignored because it represents a correlation of one variable instead of two. When the color of a tile is close to white there is no to near minimal correlation between attributes. If the tile is blue colored, there is a negative correlation present, while a red color indicates a positive correlation.
 
-
-## Clustering
-
+Next we will perform clustering:
 Clustering can be a great tool to give a better understanding of the data by discovering patterns. Below, a k-means cluster of 2 will be performed. A k of 2 has been chosen because the death event attribute has 2^1 possibilities.
 
 ```{r, echo = FALSE, message = FALSE}
@@ -241,11 +244,55 @@ fviz_pca_ind(data.pr, geom.ind = "point", pointshape = 21,
 
 The PCA-plot seems to give the same result as the k-means cluster. A 'death' cluster seems to emerge when data points go to the left. There is however overlap between the false and true clusters, so the probability to predict a correct death event might not be very high.
 
-# Discussion
+-------------
 
-Most variables seem independable of each other, as seen in the heatmap created above. This, however, is a good sign because ML algorithms need no correlated values. One point of critique might be that also data of healthy patients must be taken to look at the differences between the data of healthy people and the patients with left ventricular systolic dysfunction. Some attributes which contribute to heart disease also need to be looked at in future research. Some key attributes are: daily physical activity, cholesterol levels, patient weight / BMI and most importantly for a bioinformatician, heredity. Because a lot of heart failure cases come from people who have heart disease in their family, possible heart disease needs to be caught early.
+First, the factored data will be saved to use in the program called weka, which will be used to perform all sorts of algorithms on the data. 
+
+```{r}
+used_data <- factored_data[,c(1,8,9,13)]
+write.csv(used_data, "data/data.csv", row.names = FALSE)
+```
 
 
-# Conclusion
 
-A death event is pretty hard to predict because so many variables have impact on the health of people. So to further improve this research, a whole lot of extra attributes need to be taken into consideration. A few attributes of heart data do not give a big picture of the whole situation. Also, the group size of 'only' 299 people is quite small to draw conclusions, so to improve, more patients need to be examined.
+For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this occasion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, so it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
+
+# Performance of ML algorithms
+
+In order to choose which ML algorithm is best, it is a good exercise to look at the results of each algorithm.
+To start, Zero R and One R will be used to measure baseline performance. Although they do not seem important, they can be used to check if you are over fitting with other algorithms.
+
+Zero R only chooses which occurs the most of the death event class. Most of the people did not die during follow-up, so Zero R chooses false. The percentage of correct guesses was only 67.893% so improvements can be made by more complex algorithms. The confusion matrix contains no true values, because false was chosen by Zero R, and 96 false positives out of 299 instances.
+One R, on the other hand, did a much better job at predicting a death event. This is possibly because One R takes the best attribute to predict a death event with. 75.5853% of instances were predicted correctly, so this might be one of the better algorithms. But let's first look at the other ones. All confusion matrix values are visible in the table below.
+
+Next up, the decision trees. Because a big part of the data contains numeric values, J48 will be used, which can deal with such values. When creating a tree with a small bucket size, the tree becomes quite overwhelming. To fix this issue, a bucket size of 10 will be used which gives a much smaller tree, which also gives quite an accurate percentage: 77.9264%.
+
+Nearest neighbor seems like a good algorithm because all of the data points close to each other will 'cluster' towards one of the boolean values, true or false. When using k = 1, 100% of the values seem correct. But since it only uses the training data, it might not be useful in the long run.
+
+Naive Bayes makes a percentage based on all attributes. Some attributes might not be very good at predicting a death event, so this algorithm might not give a good prediction. When run, 72.5753% of instances were predicted correctly. This is smaller than of One R so taking all attributes is not the correct decision.
+
+There is no clear linear line visible in the data, so simple logistic might not be a good choice. When run however, 73.2442% of instances were correctly predicted. The only down side is that 69 people got a false positive result, which is a pretty big chunk of patients. This situation should never happen in hospitals so this algorithm also does not function per request.
+
+```{r}
+codebook <- read.delim("data/algorithm_data.csv", sep = ",")
+kable(codebook, caption = "Table 2a : Algorithm Data")
+```
+
+```{r}
+codebook <- read.delim("data/algorithm_data_validated.csv", sep = ",")
+kable(codebook, caption = "Table 2b : Validated Algorithm Data")
+```
+
+# Ensemble Learning
+
+Next up, meta learners will be used to further validate the model, and also run statistical tests. There are multiple meta learners available, but for this research, 3 of them will be used: Stacking, Bagging and Boosting. With stacking, multiple algorithms will all perform a task, whichever algorithm does best is chosen. Bagging can help to reduce variation, and prevent overfitting. It uses a bootstrapping method which samples with replacement, so the accuracy might be pretty high. Boosting works on a 'weighing' system. Each time it does a iteration, all mistakes are weight more, so those are filtered out for the next iteration. This process continues for the max iterations provided. Below, a table can be seen which represents the data given by these meta learners. For each learner, zeroR, OneR and J48 are used as algorithms with a minimal bag size of 10. For the statistical t-test, a p-value of 0.05 is chosen, mostly because it is the default p-value. The standard deviation is also visible in the table to illustrate what the range of deviation is between all iterations.
+
+```{r}
+codebook <- read.delim("data/meta-learner_data.csv", sep = ",")
+knitr::kable(codebook, escape = TRUE)
+```
+
+Weeks 5 till 7;
+
+Creating a Java application which takes known heart data and creates a J48 model based on the model chosen for this research. When a batch file of unknown instances, or a single instance is fed to the file, it will classify all of the instances. So true or false ( dead or alive ). The wrapper can be found with the following link: https://github.com/JurrienDeJong/JavaWrapper/tree/main/src/main/java/nl/bioinf/wrapper
+
