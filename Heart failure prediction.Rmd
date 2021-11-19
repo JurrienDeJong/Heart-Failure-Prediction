@@ -260,16 +260,16 @@ The PCA-plot seems to give the same result as the k-means cluster. A 'death' clu
 
 For every machine learning research, there should be a fine balance between sensitivity and specificity. When evaluating ML algorithm performance, accuracy is the default quality metric. For this occasion, the speed of the algorithm is not that important. But if the dataset contains all the records of patients in a 10 year period, speed is a big factor. A small group of patients was examined for this research, so it might be a good idea to let the algorithm learn overtime when new data is added. This is because 'only' 299 patients does not always give the big picture. The quality metric accuracy might be the most important for this research. It is very important to get an accurate result from a patient because it could predict someone's death chance. For this reason the most accurate yet somewhat speedy algorithm will be chosen.
 
-```{r, echo = false}
+```{r, echo = FALSE}
 codebook <- read.delim("data/algorithm_data.csv", sep = ",")
 knitr::kable(codebook, caption = "Table 2a : Algorithm Data")
 ```
-![The J48 tree visualized by the Weka Tree visualize function.](data/j48_model.png)
+!["The J48 tree visualized by the Weka Tree visualize function."](data/j48_model.png)
+!["The ROC Curve visualising the sensitivity as function of specificity."](data/roc.png)
 The final tree, after loads of test runs, is the unpruned J48 tree with a bucket size of 10. It has an accuracy of 77.93% which was one of the best as seen in the table above. As also seen in the table above, IBK and random forest both scored very high. But because the primary target audience are doctors, the algorithm needs to be fairly simple so they can understand it too. J48 is, compared to IBk and random forest, simplistic, which is why this consideration has been made.
 
-Visualizing the algorithm's performance results can be done via the ROC-Curve. ROC stands for receiver operating characteristic. This is a graph of sensitivity as function of specificity, showing how well the algorithm can classify. The value of a ROC curve can range between 0, a very bad model, to 1, a perfect model ( which is not realistic ). It represents the area under the curve. The value of the heart failure model equals to 0.64, so improvements can be made for future research. Below the created ROC curve can be seen:
+Visualizing the algorithm's performance results can be done via the ROC-Curve. ROC stands for receiver operating characteristic. This is a graph of sensitivity as function of specificity, showing how well the algorithm can classify. The value of a ROC curve can range between 0, a very bad model, to 1, a perfect model ( which is not realistic ). It represents the area under the curve. The value of the heart failure model equals to 0.64, so improvements can be made for future research. Above the created ROC curve can be seen:
 
-![The ROC Curve visualising the sensitivity as function of specificity.](data/roc.png)
 
 
 # Discussion
