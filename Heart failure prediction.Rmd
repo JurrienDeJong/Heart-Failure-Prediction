@@ -267,6 +267,11 @@ knitr::kable(codebook, caption = "Table 2a : Algorithm Data")
 ![The J48 tree visualized by the Weka Tree visualize function.](data/j48_model.png)
 The final tree, after loads of test runs, is the unpruned J48 tree with a bucket size of 10. It has an accuracy of 77.93% which was one of the best as seen in the table above. As also seen in the table above, IBK and random forest both scored very high. But because the primary target audience are doctors, the algorithm needs to be fairly simple so they can understand it too. J48 is, compared to IBk and random forest, simplistic, which is why this consideration has been made.
 
+Visualizing the algorithm's performance results can be done via the ROC-Curve. ROC stands for receiver operating characteristic. This is a graph of sensitivity as function of specificity, showing how well the algorithm can classify. The value of a ROC curve can range between 0, a very bad model, to 1, a perfect model ( which is not realistic ). It represents the area under the curve. The value of the heart failure model equals to 0.64, so improvements can be made for future research. Below the created ROC curve can be seen:
+
+![The ROC Curve visualising the sensitivity as function of specificity.](data/roc.png)
+
+
 # Discussion
 
 Most variables seem independable of each other, as seen in the heatmap created above. This, however, is a good sign because ML algorithms need no correlated values. One point of critique might be that also data of healthy patients must be taken to look at the differences between the data of healthy people and the patients with left ventricular systolic dysfunction. 
@@ -275,7 +280,7 @@ Some attributes which contribute to heart disease also need to be looked at in f
 
 # Conclusion
 
-With the machine learning results and J48 scoring 77.93% accuracy.The overall result is not what should be expected to be used in hospitals.
+With the machine learning results, J48 scoring 77.93% accuracy and an area under the curve of 0.64. The overall result is not what should be expected to be used in hospitals. 
 
 A death event is pretty hard to predict because so many variables have impact on the health of people. So to further improve this research, a whole lot of extra attributes need to be taken into consideration. A few attributes of heart data do not give a big picture of the whole situation. Also, the group size of 'only' 299 people is quite small to draw conclusions, so to improve, more patients need to be examined. J48 is also an algorithm which is easy to understand, since it uses a decision tree. With this model, a Java wrapper was made to classify new instances via the command line. Printing the classification label to the terminal output.
 
