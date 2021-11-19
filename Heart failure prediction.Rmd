@@ -29,7 +29,7 @@ library("factoextra")
 
 # Introduction
 
-The dataset \cite{Machine learning repo} analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
+The dataset \cite{MLR} analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
 
 Heart failure is quite common, and thus affects a lot of people each year. The condition is the leading cause of hospitalization in people over age 65. One solution might be to prevent heart failure from happening by examining large datasets full of data which are known to relate (closely) to heart disease and/or heart failure. This research is trying to replicate this solution with a supplied dataset.
 
@@ -134,7 +134,7 @@ p1 <- ggplot(data = factored_data, aes(x = age, y = serum_creatinine, colour = D
       ylab("Serum creatinine ( in mg/dL )") +
       labs(caption = "The relations between age, serum creatinine and if the 
            person died during follow-up") +
-      geom_point(alpha = 0.01) + 
+      geom_point(alpha = 0.75) + 
       scale_color_manual(values=myColors) + 
       geom_jitter(width = 0.3) + 
       geom_smooth(method = "loess", formula = y ~ x) +
@@ -147,7 +147,7 @@ p2 <- ggplot(data = factored_data, aes(x = age, y = serum_sodium, colour = DEATH
       ylab("Serum sodium ( in mEq/L )") +
       labs(caption = "The relations between age, serum sodium and if the 
            person died during follow-up") +
-      geom_point(alpha = 0.01) + 
+      geom_point(alpha = 0.75) + 
       scale_color_manual(values=myColors) + 
       geom_jitter(width = 0.3) + 
       geom_smooth(method = "loess", formula = y ~ x) +
@@ -290,7 +290,7 @@ For future research, the model could be used for other projects. The minor Appli
 
 \newpage
 \begin{thebibliography}{9}
-\bibitem{ICS}
+\bibitem{MLR}
 Davide Chicco: \textit{Machine learning repo}, 
 Heart failure clinical records Data Set, Retrieved from https://archive.ics.uci.edu/ml/datasets/Heart+failure+clinical+records
 
