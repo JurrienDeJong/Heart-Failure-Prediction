@@ -264,6 +264,8 @@ For every machine learning research, there should be a fine balance between sens
 codebook <- read.delim("data/algorithm_data.csv", sep = ",")
 knitr::kable(codebook, caption = "Table 2a : Algorithm Data")
 ```
+![The J48 tree visualized by the Weka Tree visualize function.](data/j48_model.png)
+The final tree, after loads of test runs, is the unpruned J48 tree with a bucket size of 10. It has an accuracy of 77.93% which was one of the best as seen in the table above. As also seen in the table above, IBK and random forest both scored very high. But because the primary target audience are doctors, the algorithm needs to be fairly simple so they can understand it too. J48 is, compared to IBk and random forest, simplistic, which is why this consideration has been made.
 
 # Discussion
 
