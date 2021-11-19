@@ -29,7 +29,7 @@ library("factoextra")
 
 # Introduction
 
-The dataset analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
+The dataset \cite{Machine learning repo} analyzed for this research contains the medical records of 299 heart failure patients collected at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan), during April–December 2015. The patients consisted of 105 women and 194 men, and their ages range between 40 and 95 years old. All patients had left ventricular systolic dysfunction which puts them on a higher risk of death, this needs to be kept in mind when looking at the data.
 
 Heart failure is quite common, and thus affects a lot of people each year. The condition is the leading cause of hospitalization in people over age 65. One solution might be to prevent heart failure from happening by examining large datasets full of data which are known to relate (closely) to heart disease and/or heart failure. This research is trying to replicate this solution with a supplied dataset.
 
@@ -115,7 +115,7 @@ As seen in figure A above, the data contains many outliers. A normal serum creat
 
 # Relationship between attributes
 
-It is important to get to know what kind of relationship there is between the variables. Let's first 'cut out' the part of the data which will be used for the research. The serum and age data will be used, which are from columns 1,8 and 9 because the age, serum creatinine and serum sodium values have a great impact on heart disease and renal dysfunction, as seen in "Survival analysis of heart failure patients: a case study". Below the relations are plotted in graphs:
+It is important to get to know what kind of relationship there is between the variables. Let's first 'cut out' the part of the data which will be used for the research. The serum and age data will be used, which are from columns 1,8 and 9 because the age, serum creatinine and serum sodium values have a great impact on heart disease and renal dysfunction, as seen in \cite{BMC}. Below the relations are plotted in graphs:
 
 ```{r, echo = FALSE, message= FALSE}
 # Get the columns we will use for this research
@@ -287,3 +287,14 @@ A death event is pretty hard to predict because so many variables have impact on
 ## Future research
 
 For future research, the model could be used for other projects. The minor Application Design is such a project. The classifier should be accessible for i.e. doctors. That is why a desktop application could be made for use in hospitals to give a indication what the outcome is for patients. The only thing necessary is a blood test for the blood serum data which is not that big of a hassle. Because the model has an accuracy of close to 80 percent, more attributes need to be selected to give a better outcome. Since a doctor has a lot of supplies at hand, getting this data is very easy. The reason a desktop app is much more valuable is because doctors store most data of patients on the hospital server, the application could also be linked to this local network for safety/privacy reasons.
+
+\newpage
+\begin{thebibliography}{9}
+\bibitem{ICS}
+Davide Chicco: \textit{Machine learning repo}, 
+Heart failure clinical records Data Set, Retrieved from https://archive.ics.uci.edu/ml/datasets/Heart+failure+clinical+records
+
+\bibitem{BMC}
+Machine learning repository: \textit{Medical Informatics}, BMC Medical Informatics and Decision Making, Retrieved from https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/s12911-020-1023-5 on 09-12-2020
+
+\end{thebibliography}
